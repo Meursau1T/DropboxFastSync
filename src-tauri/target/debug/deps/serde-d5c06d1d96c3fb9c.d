@@ -1,0 +1,14 @@
+/Users/xinfu.wang/Source/fastShare/src-tauri/target/debug/deps/serde-d5c06d1d96c3fb9c.d: /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /Users/xinfu.wang/Source/fastShare/src-tauri/target/debug/build/serde-ed3d927fc6099e73/out/private.rs
+
+/Users/xinfu.wang/Source/fastShare/src-tauri/target/debug/deps/libserde-d5c06d1d96c3fb9c.rlib: /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /Users/xinfu.wang/Source/fastShare/src-tauri/target/debug/build/serde-ed3d927fc6099e73/out/private.rs
+
+/Users/xinfu.wang/Source/fastShare/src-tauri/target/debug/deps/libserde-d5c06d1d96c3fb9c.rmeta: /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /Users/xinfu.wang/Source/fastShare/src-tauri/target/debug/build/serde-ed3d927fc6099e73/out/private.rs
+
+/Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs:
+/Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs:
+/Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs:
+/Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs:
+/Users/xinfu.wang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs:
+/Users/xinfu.wang/Source/fastShare/src-tauri/target/debug/build/serde-ed3d927fc6099e73/out/private.rs:
+
+# env-dep:OUT_DIR=/Users/xinfu.wang/Source/fastShare/src-tauri/target/debug/build/serde-ed3d927fc6099e73/out
