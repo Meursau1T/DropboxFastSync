@@ -1,15 +1,6 @@
 import './styles.css';
-import { renderApp, renderFileListPublic } from './ui';
+import { renderApp, renderFileListPublic, showSection } from './ui';
 import { restoreSession, isAuthenticated } from './auth';
-
-function showSection(section: 'loading' | 'auth' | 'main'): void {
-  document.getElementById('loading')!.style.display =
-    section === 'loading' ? 'flex' : 'none';
-  document.getElementById('auth-section')!.style.display =
-    section === 'auth' ? 'block' : 'none';
-  document.getElementById('main-section')!.style.display =
-    section === 'main' ? 'block' : 'none';
-}
 
 async function init(): Promise<void> {
   renderApp();

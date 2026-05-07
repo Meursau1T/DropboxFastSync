@@ -86,3 +86,11 @@ export async function deleteFile(filePath: string): Promise<void> {
   const dbx = getDropbox()!;
   await dbx.filesDeleteV2({ path: filePath });
 }
+
+export async function downloadFile(filePath: string): Promise<string> {
+  if (!isAuthenticated()) throw new Error('Not authenticated');
+
+  const dbx = getDropbox()!;
+  const response = await dbx.filesGetTemporaryLink({ path: filePath });
+  return response.result.link;
+}

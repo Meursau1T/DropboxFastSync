@@ -1,6 +1,14 @@
 import { getCurrentWindow } from '@tauri-apps/api/window';
+import { openUrl } from '@tauri-apps/plugin-opener';
+import { createIcons, LogIn, LogOut, RefreshCw, Upload, File, Trash2, Download } from 'lucide';
 import { startOAuth, clearSession } from './auth';
-import { listFiles, uploadFiles, uploadFileBuffer, deleteFile, type DropboxFile } from './api';
+import { listFiles, uploadFiles, uploadFileBuffer, deleteFile, downloadFile, type DropboxFile } from './api';
+
+const lucideIcons = { LogIn, LogOut, RefreshCw, Upload, File, Trash2, Download };
+
+function initIcons(root?: HTMLElement): void {
+  createIcons({ icons: lucideIcons, root });
+}
 
 let files: DropboxFile[] = [];
 
@@ -9,29 +17,23 @@ export function renderApp(): void {
   app.innerHTML = `
     <div class="container">
       <header>
-        <h1>fastShare</h1>
+        <h1>FastShare</h1>
         <p class="subtitle">Drop files to upload to Dropbox</p>
+        <button id="logout-btn" class="btn-logout" title="Sign Out" style="display:none">
+          <i data-lucide="log-out"></i>
+        </button>
       </header>
 
       <div id="auth-section">
-        <button id="login-btn" class="btn-primary">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-            <polyline points="10 17 15 12 10 7"/>
-            <line x1="15" y1="12" x2="3" y2="12"/>
-          </svg>
-          Sign in with Dropbox
+        <button id="login-btn" class="btn-primary btn-icon" title="Sign in with Dropbox">
+          <i data-lucide="log-in"></i>
         </button>
       </div>
 
       <div id="main-section" style="display:none">
         <div id="drop-zone">
           <div class="drop-zone-content">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="17 8 12 3 7 8"/>
-              <line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
+            <i data-lucide="upload"></i>
             <p class="drop-text">Drop files here to upload</p>
             <p class="drop-hint">or click / Ctrl+V to paste</p>
           </div>
@@ -41,7 +43,9 @@ export function renderApp(): void {
 
         <div class="file-list-header">
           <h2>Uploaded Files</h2>
-          <button id="refresh-btn" class="btn-secondary">Refresh</button>
+          <button id="refresh-btn" class="btn-secondary btn-icon" title="Refresh">
+            <i data-lucide="refresh-cw"></i>
+          </button>
         </div>
 
         <div id="file-list-container">
@@ -51,9 +55,6 @@ export function renderApp(): void {
           </div>
         </div>
 
-        <div class="footer">
-          <button id="logout-btn" class="btn-secondary">Sign Out</button>
-        </div>
       </div>
 
       <div id="loading" class="loading" style="display:none">
@@ -64,6 +65,7 @@ export function renderApp(): void {
   `;
 
   bindEvents();
+  initIcons();
 }
 
 function bindEvents(): void {
@@ -81,14 +83,16 @@ function bindEvents(): void {
   setupPaste();
 }
 
-function showSection(section: 'loading' | 'auth' | 'main'): void {
+export function showSection(section: 'loading' | 'auth' | 'main'): void {
   const loading = document.getElementById('loading')!;
   const authSection = document.getElementById('auth-section')!;
   const mainSection = document.getElementById('main-section')!;
+  const logoutBtn = document.getElementById('logout-btn')!;
 
   loading.style.display = section === 'loading' ? 'flex' : 'none';
   authSection.style.display = section === 'auth' ? 'block' : 'none';
   mainSection.style.display = section === 'main' ? 'block' : 'none';
+  logoutBtn.style.display = section === 'main' ? 'inline-flex' : 'none';
 }
 
 function setLoading(text: string): void {
@@ -140,6 +144,17 @@ async function handleDelete(path: string): Promise<void> {
   }
 }
 
+async function handleDownload(path: string): Promise<void> {
+  try {
+    showStatus('Preparing download...');
+    const url = await downloadFile(path);
+    await openUrl(url);
+  } catch (e) {
+    showStatus('Failed to download file', true);
+    console.error(e);
+  }
+}
+
 async function renderFileList(): Promise<void> {
   try {
     files = await listFiles();
@@ -158,29 +173,28 @@ async function renderFileList(): Promise<void> {
         (f) => `
         <div class="file-item">
           <div class="file-info">
-            <span class="file-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
-                <polyline points="13 2 13 9 20 9"/>
-              </svg>
-            </span>
+            <span class="file-icon"><i data-lucide="file"></i></span>
             <div class="file-details">
               <span class="file-name" title="${f.path}">${f.name}</span>
               <span class="file-meta">${formatSize(f.size)} · ${formatDate(f.client_modified)}</span>
             </div>
           </div>
-          <button class="btn-delete" data-path="${f.path}" title="Delete file">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="3 6 5 6 21 6"/>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-            </svg>
-          </button>
+          <button class="btn-download" data-path="${f.path}" title="Download file"><i data-lucide="download"></i></button>
+          <button class="btn-delete" data-path="${f.path}" title="Delete file"><i data-lucide="trash-2"></i></button>
         </div>
       `,
       )
       .join('');
 
-    // Bind delete buttons
+    // Bind download and delete buttons
+    fileList.querySelectorAll('.btn-download').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const path = (btn as HTMLElement).dataset.path;
+        if (path) handleDownload(path);
+      });
+    });
+
     fileList.querySelectorAll('.btn-delete').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -188,6 +202,8 @@ async function renderFileList(): Promise<void> {
         if (path) handleDelete(path);
       });
     });
+
+    initIcons(fileList);
   } catch (e) {
     console.error('Failed to list files:', e);
     showStatus('Failed to load file list', true);

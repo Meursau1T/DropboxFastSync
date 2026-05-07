@@ -36,6 +36,7 @@ html, body {
 }
 
 .container {
+  position: relative;
   width: 100%;
   max-width: 640px;
   padding: 32px 24px;
@@ -104,6 +105,64 @@ header h1 {
   background: var(--surface-hover);
 }
 
+.btn-icon {
+  padding: 10px;
+  line-height: 0;
+  background: transparent;
+  border: none;
+  color: var(--text);
+}
+
+.btn-icon:hover {
+  color: #000;
+  background: transparent;
+}
+
+.btn-primary .lucide {
+  width: 20px;
+  height: 20px;
+}
+
+.btn-secondary .lucide {
+  width: 16px;
+  height: 16px;
+}
+
+.file-icon .lucide {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-delete .lucide {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-download {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-download:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #000;
+}
+
+.btn-download .lucide {
+  width: 16px;
+  height: 16px;
+}
+
 /* Drop Zone */
 #drop-zone {
   border: 2px dashed var(--border);
@@ -120,9 +179,12 @@ header h1 {
   background: rgba(0, 0, 0, 0.04);
 }
 
-.drop-zone-content svg {
+.drop-zone-content svg,
+.drop-zone-content .lucide {
   color: var(--text-secondary);
   margin-bottom: 12px;
+  width: 48px;
+  height: 48px;
 }
 
 .drop-text {
@@ -251,6 +313,32 @@ header h1 {
 .footer {
   margin-top: 16px;
   text-align: center;
+}
+
+.btn-logout {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  line-height: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: color 0.15s;
+}
+
+.btn-logout:hover {
+  color: #000;
+}
+
+.btn-logout .lucide {
+  width: 18px;
+  height: 18px;
 }
 
 /* Loading */
