@@ -63,6 +63,23 @@ export async function uploadFiles(filePaths: string[]): Promise<string[]> {
   return results;
 }
 
+export async function uploadFileBuffer(name: string, data: ArrayBuffer): Promise<string> {
+  if (!isAuthenticated()) throw new Error('Not authenticated');
+
+  const dbx = getDropbox()!;
+  console.log(`[upload] uploading buffer: ${name}, size=${data.byteLength}`);
+
+  const result = await dbx.filesUpload({
+    path: `/${name}`,
+    contents: data,
+    mode: { '.tag': 'add' },
+    autorename: true,
+  });
+  console.log(`[upload] buffer success: ${result.result.name} (${result.result.size} bytes)`);
+
+  return result.result.name;
+}
+
 export async function deleteFile(filePath: string): Promise<void> {
   if (!isAuthenticated()) throw new Error('Not authenticated');
 

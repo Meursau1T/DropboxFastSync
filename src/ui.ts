@@ -1,6 +1,6 @@
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { startOAuth, clearSession } from './auth';
-import { listFiles, uploadFiles, deleteFile, type DropboxFile } from './api';
+import { listFiles, uploadFiles, uploadFileBuffer, deleteFile, type DropboxFile } from './api';
 
 let files: DropboxFile[] = [];
 
@@ -33,7 +33,7 @@ export function renderApp(): void {
               <line x1="12" y1="3" x2="12" y2="15"/>
             </svg>
             <p class="drop-text">Drop files here to upload</p>
-            <p class="drop-hint">or click to select files</p>
+            <p class="drop-hint">or click / Ctrl+V to paste</p>
           </div>
         </div>
 
@@ -78,6 +78,7 @@ function bindEvents(): void {
   dropZone?.addEventListener('click', () => handleClickUpload());
 
   setupDragDrop();
+  setupPaste();
 }
 
 function showSection(section: 'loading' | 'auth' | 'main'): void {
@@ -247,15 +248,102 @@ async function handleClickUpload(): Promise<void> {
   input.multiple = true;
   input.onchange = async () => {
     if (input.files && input.files.length > 0) {
-      // We need the paths — but browser File objects don't have paths
-      // On Tauri, we can use the legacy approach
+      const fileList = Array.from(input.files);
+      await handleClipboardFiles(fileList);
     }
   };
-  // Note: web file picker doesn't provide file paths in Tauri webview.
-  // For file selection in Tauri, use the dialog plugin.
-  // For now, drag-drop is the primary upload method.
-  // The click handler just focuses on the drop zone area.
-  showStatus('Drag and drop files onto this area to upload', true);
+  input.click();
+}
+
+function setupPaste(): void {
+  document.addEventListener('paste', (event: ClipboardEvent) => {
+    const active = document.activeElement;
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return;
+
+    const items = event.clipboardData?.items;
+    if (!items || items.length === 0) return;
+
+    const files: File[] = [];
+    let textContent = '';
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.kind === 'file') {
+        const file = item.getAsFile();
+        if (file) files.push(file);
+      } else if (item.kind === 'string' && item.type === 'text/plain') {
+        textContent += event.clipboardData?.getData('text/plain') || '';
+      }
+    }
+
+    if (files.length > 0 || textContent) {
+      event.preventDefault();
+      handlePasteUpload(files, textContent);
+    }
+  });
+}
+
+async function handlePasteUpload(files: File[], text: string): Promise<void> {
+  const count = files.length + (text ? 1 : 0);
+  setLoading(`Uploading ${count} item(s) from clipboard...`);
+
+  const results: string[] = [];
+  const errors: string[] = [];
+
+  for (const file of files) {
+    try {
+      let name = file.name || `pasted-file-${Date.now()}`;
+      if (!name || name === 'image.png') {
+        name = `pasted-image-${Date.now()}.png`;
+      }
+      const data = await file.arrayBuffer();
+      const uploadedName = await uploadFileBuffer(name, data);
+      results.push(uploadedName);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      errors.push(`${file.name || 'file'}: ${msg}`);
+    }
+  }
+
+  if (text) {
+    try {
+      const name = `pasted-text-${Date.now()}.txt`;
+      const encoder = new TextEncoder();
+      const data = encoder.encode(text).buffer;
+      const uploadedName = await uploadFileBuffer(name, data);
+      results.push(uploadedName);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      errors.push(`text: ${msg}`);
+    }
+  }
+
+  showSection('main');
+  if (results.length > 0) showStatus(`Uploaded: ${results.join(', ')}`);
+  if (errors.length > 0) showStatus(`Failed: ${errors.join(', ')}`, true);
+  await renderFileList();
+}
+
+async function handleClipboardFiles(files: File[]): Promise<void> {
+  setLoading(`Uploading ${files.length} file(s)...`);
+  const results: string[] = [];
+  const errors: string[] = [];
+
+  for (const file of files) {
+    try {
+      const data = await file.arrayBuffer();
+      const uploadedName = await uploadFileBuffer(file.name, data);
+      results.push(uploadedName);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      errors.push(`${file.name}: ${msg}`);
+    }
+  }
+
+  showSection('main');
+  if (results.length > 0) showStatus(`Uploaded: ${results.join(', ')}`);
+  if (errors.length > 0) showStatus(`Failed: ${errors.join(', ')}`, true);
+  await renderFileList();
 }
 
 async function handleUpload(filePaths: string[]): Promise<void> {
