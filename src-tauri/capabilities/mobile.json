@@ -1,0 +1,36 @@
+{
+  "identifier": "mobile",
+  "description": "Mobile capability for fastShare",
+  "platforms": ["android", "iOS"],
+  "permissions": [
+    "core:default",
+    "http:default",
+    {
+      "identifier": "http:default",
+      "allow": [
+        { "url": "https://api.dropboxapi.com/**" },
+        { "url": "https://content.dropboxapi.com/**" },
+        { "url": "https://www.dropbox.com/**" },
+        { "url": "https://api.dropbox.com/**" }
+      ]
+    },
+    "fs:default",
+    {
+      "identifier": "fs:allow-read",
+      "allow": [
+        { "path": "$HOME/**" },
+        { "path": "$DESKTOP/**" },
+        { "path": "$DOCUMENT/**" },
+        { "path": "$DOWNLOAD/**" }
+      ]
+    },
+    "store:default",
+    "opener:default",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        { "url": "https://www.dropbox.com/**" }
+      ]
+    }
+  ]
+}
