@@ -5,16 +5,17 @@
 }
 
 :root {
-  --bg: #0a0a0f;
-  --surface: #14141f;
-  --surface-hover: #1e1e2e;
-  --border: #2a2a3e;
-  --text: #e4e4f0;
-  --text-secondary: #8888a0;
-  --accent: #0061fe;
-  --accent-hover: #1a75ff;
-  --danger: #e5484d;
-  --danger-hover: #ff6369;
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface: #f3f3f3;
+  --surface-hover: #e5e5e5;
+  --border: #d4d4d4;
+  --text: #171717;
+  --text-secondary: #737373;
+  --accent: #171717;
+  --accent-hover: #404040;
+  --danger: #737373;
+  --danger-hover: #404040;
   --radius: 8px;
 }
 
@@ -116,7 +117,7 @@ header h1 {
 
 #drop-zone.drag-over {
   border-color: var(--accent);
-  background: rgba(0, 97, 254, 0.06);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .drop-zone-content svg {
@@ -145,15 +146,15 @@ header h1 {
 }
 
 .status-message.success {
-  background: rgba(48, 209, 88, 0.12);
-  color: #30d158;
-  border: 1px solid rgba(48, 209, 88, 0.2);
+  background: rgba(0, 0, 0, 0.05);
+  color: #404040;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .status-message.error {
-  background: rgba(229, 72, 77, 0.12);
+  background: rgba(0, 0, 0, 0.07);
   color: var(--danger);
-  border: 1px solid rgba(229, 72, 77, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 /* File List */
@@ -242,7 +243,7 @@ header h1 {
 }
 
 .btn-delete:hover {
-  background: rgba(229, 72, 77, 0.12);
+  background: rgba(0, 0, 0, 0.06);
   color: var(--danger);
 }
 
