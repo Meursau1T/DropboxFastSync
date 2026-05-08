@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "build:mac": "pnpm tauri build --bundles app && hdiutil create -volname 'FastShare' -srcfolder src-tauri/target/release/bundle/macos/FastShare.app -ov -format UDZO src-tauri/target/release/bundle/macos/FastShare.dmg",
-    "build:android": "ANDROID_HOME=\"$HOME/Library/Android/sdk\" JAVA_HOME=\"$(dirname $(dirname $(readlink -f $(which java))))\" pnpm tauri android build --debug",
+    "build:android": "KEYSTORE_FILE=\"$HOME/keystore/fastshare.keystore\" KEY_ALIAS=fastshare ANDROID_HOME=\"$HOME/Library/Android/sdk\" JAVA_HOME=\"$(dirname $(dirname $(readlink -f $(which java))))\" pnpm tauri android build",
+    "build:android:debug": "ANDROID_HOME=\"$HOME/Library/Android/sdk\" JAVA_HOME=\"$(dirname $(dirname $(readlink -f $(which java))))\" pnpm tauri android build --debug",
     "dev:android": "pnpm tauri android dev",
     "dev:mac": "pnpm tauri dev"
   },
