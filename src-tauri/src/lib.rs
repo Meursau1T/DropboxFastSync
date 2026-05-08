@@ -38,7 +38,7 @@ fn toggle_tray_panel(app: &tauri::AppHandle, position: tauri::PhysicalPosition<f
             panel_label,
             tauri::WebviewUrl::App("index.html".into()),
         )
-        .title("fastShare")
+        .title("FastShare")
         .inner_size(350.0, 500.0)
         .position(
             (position.x as f64) - 175.0,

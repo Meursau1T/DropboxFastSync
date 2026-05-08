@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Default capability for fastShare",
+  "description": "Default capability for FastShare",
   "windows": ["main", "tray-panel"],
   "permissions": [
     "core:default",

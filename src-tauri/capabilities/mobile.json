@@ -1,6 +1,6 @@
 {
   "identifier": "mobile",
-  "description": "Mobile capability for fastShare",
+  "description": "Mobile capability for FastShare",
   "platforms": ["android", "iOS"],
   "permissions": [
     "core:default",
