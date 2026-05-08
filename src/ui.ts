@@ -2,17 +2,29 @@ import { getCurrentWindow } from '@tauri-apps/api/window';
 import { fetch } from '@tauri-apps/plugin-http';
 import { writeFile, BaseDirectory } from '@tauri-apps/plugin-fs';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
-import { createIcons, LogIn, LogOut, RefreshCw, Upload, File, Trash2, Download, Copy } from 'lucide';
+import { createIcons, LogIn, LogOut, RefreshCw, Upload, File, Trash2, Trash, Download, Copy } from 'lucide';
 import { startOAuth, clearSession } from './auth';
-import { listFiles, uploadFiles, uploadFileBuffer, deleteFile, downloadFile, type DropboxFile } from './api';
+import { listFiles, uploadFiles, uploadFileBuffer, deleteFile, deleteAllFiles, downloadFile, type DropboxFile } from './api';
 
-const lucideIcons = { LogIn, LogOut, RefreshCw, Upload, File, Trash2, Download, Copy };
+const lucideIcons = { LogIn, LogOut, RefreshCw, Upload, File, Trash2, Trash, Download, Copy };
 
 function initIcons(root?: HTMLElement): void {
   createIcons({ icons: lucideIcons, root });
 }
 
 let files: DropboxFile[] = [];
+let lastRefreshTime = 0;
+const REFRESH_THROTTLE_MS = 2000;
+
+async function throttledRefresh(): Promise<void> {
+  const now = Date.now();
+  if (now - lastRefreshTime < REFRESH_THROTTLE_MS) return;
+  // 只在已登录（main-section 可见）时刷新
+  const mainSection = document.getElementById('main-section');
+  if (!mainSection || mainSection.style.display === 'none') return;
+  lastRefreshTime = now;
+  await renderFileList();
+}
 
 export function renderApp(): void {
   const app = document.getElementById('app')!;
@@ -45,9 +57,14 @@ export function renderApp(): void {
 
         <div class="file-list-header">
           <h2>Uploaded Files</h2>
-          <button id="refresh-btn" class="btn-secondary btn-icon" title="Refresh">
-            <i data-lucide="refresh-cw"></i>
-          </button>
+          <div class="header-actions">
+            <button id="refresh-btn" class="btn-secondary btn-icon" title="Refresh">
+              <i data-lucide="refresh-cw"></i>
+            </button>
+            <button id="clear-btn" class="btn-secondary btn-icon" title="Clear All">
+              <i data-lucide="trash"></i>
+            </button>
+          </div>
         </div>
 
         <div id="file-list-container">
@@ -74,15 +91,34 @@ function bindEvents(): void {
   const loginBtn = document.getElementById('login-btn');
   const logoutBtn = document.getElementById('logout-btn');
   const refreshBtn = document.getElementById('refresh-btn');
+  const clearBtn = document.getElementById('clear-btn');
   const dropZone = document.getElementById('drop-zone');
 
   loginBtn?.addEventListener('click', handleLogin);
   logoutBtn?.addEventListener('click', handleLogout);
   refreshBtn?.addEventListener('click', handleRefresh);
+  clearBtn?.addEventListener('click', handleClearAll);
   dropZone?.addEventListener('click', () => handleClickUpload());
 
   setupDragDrop();
   setupPaste();
+  setupAutoRefresh();
+}
+
+function setupAutoRefresh(): void {
+  // 浏览器 tab 可见性变化
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      throttledRefresh();
+    }
+  });
+
+  // Tauri 窗口焦点变化（从后台切回前台）
+  getCurrentWindow().onFocusChanged(({ payload: focused }) => {
+    if (focused) {
+      throttledRefresh();
+    }
+  });
 }
 
 export function showSection(section: 'loading' | 'auth' | 'main'): void {
@@ -133,6 +169,17 @@ async function handleLogout(): Promise<void> {
 
 async function handleRefresh(): Promise<void> {
   await renderFileList();
+}
+
+async function handleClearAll(): Promise<void> {
+  try {
+    await deleteAllFiles();
+    files = [];
+    renderEmptyFileList();
+  } catch (err) {
+    console.error('Clear all failed:', err);
+    showStatus('Failed to clear files', true);
+  }
 }
 
 async function handleDelete(path: string): Promise<void> {

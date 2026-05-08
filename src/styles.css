@@ -235,6 +235,11 @@ header h1 {
   font-weight: 600;
 }
 
+.header-actions {
+  display: flex;
+  gap: 6px;
+}
+
 .file-list {
   flex: 1;
   overflow-y: auto;

@@ -87,6 +87,29 @@ export async function deleteFile(filePath: string): Promise<void> {
   await dbx.filesDeleteV2({ path: filePath });
 }
 
+export async function deleteAllFiles(): Promise<void> {
+  if (!isAuthenticated()) throw new Error('Not authenticated');
+
+  const dbx = getDropbox()!;
+  const fileList = await listFiles();
+  if (fileList.length === 0) return;
+
+  const entries = fileList.map((f) => ({ path: f.path }));
+  const response = await dbx.filesDeleteBatch({ entries });
+
+  if (response.result['.tag'] === 'async_job_id') {
+    const jobId = response.result.async_job_id;
+    while (true) {
+      const check = await dbx.filesDeleteBatchCheck({ async_job_id: jobId });
+      if (check.result['.tag'] === 'complete') break;
+      if (check.result['.tag'] === 'failed') {
+        throw new Error('Batch delete failed');
+      }
+      await new Promise((r) => setTimeout(r, 500));
+    }
+  }
+}
+
 export async function downloadFile(filePath: string): Promise<string> {
   if (!isAuthenticated()) throw new Error('Not authenticated');
 
