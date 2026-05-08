@@ -2,6 +2,7 @@ mod oauth;
 
 use std::fs;
 use tauri::Manager;
+#[cfg(desktop)]
 use tauri::tray::{TrayIconEvent, MouseButtonState};
 
 
@@ -18,6 +19,7 @@ fn read_file(path: String) -> Result<Vec<u8>, String> {
     Ok(data)
 }
 
+#[cfg(desktop)]
 fn toggle_tray_panel(app: &tauri::AppHandle, position: tauri::PhysicalPosition<f64>) {
     let panel_label = "tray-panel";
 
@@ -67,14 +69,17 @@ pub fn run() {
         .plugin(tauri_plugin_clipboard_manager::init())
         .invoke_handler(tauri::generate_handler![start_oauth, read_file])
         .setup(|app| {
-            // Set up tray icon click handler
-            if let Some(tray) = app.tray_by_id("main-tray") {
-                let app_handle = app.handle().clone();
-                tray.on_tray_icon_event(move |_tray, event| {
-                    if let TrayIconEvent::Click { position, button_state: MouseButtonState::Up, .. } = event {
-                        toggle_tray_panel(&app_handle, position);
-                    }
-                });
+            #[cfg(desktop)]
+            {
+                // Set up tray icon click handler
+                if let Some(tray) = app.tray_by_id("main-tray") {
+                    let app_handle = app.handle().clone();
+                    tray.on_tray_icon_event(move |_tray, event| {
+                        if let TrayIconEvent::Click { position, button_state: MouseButtonState::Up, .. } = event {
+                            toggle_tray_panel(&app_handle, position);
+                        }
+                    });
+                }
             }
             Ok(())
         })
