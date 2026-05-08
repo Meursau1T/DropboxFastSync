@@ -21,6 +21,11 @@
         "dragDropEnabled": true
       }
     ],
+    "trayIcon": {
+      "id": "main-tray",
+      "iconPath": "icons/32x32.png",
+      "tooltip": "fastShare"
+    },
     "security": {
       "csp": null
     }

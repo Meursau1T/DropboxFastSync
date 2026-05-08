@@ -384,3 +384,47 @@ header h1 {
   min-height: 0;
   overflow-y: auto;
 }
+
+/* Tray panel compact mode */
+@media (max-width: 400px) {
+  .container {
+    padding: 16px 12px;
+  }
+
+  header h1 {
+    font-size: 20px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
+
+  #drop-zone {
+    padding: 20px 12px;
+    margin-bottom: 12px;
+  }
+
+  .drop-zone-content svg,
+  .drop-zone-content .lucide {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+  }
+
+  .drop-text {
+    font-size: 13px;
+  }
+
+  .file-item {
+    padding: 8px 8px;
+  }
+
+  .file-name {
+    font-size: 13px;
+  }
+
+  .btn-logout {
+    top: 12px;
+    right: 12px;
+  }
+}
