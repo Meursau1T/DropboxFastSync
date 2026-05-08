@@ -27,6 +27,7 @@
       ]
     },
     "fs:allow-download-write",
+    "clipboard-manager:allow-write-text",
     "store:default",
     "opener:default",
     {

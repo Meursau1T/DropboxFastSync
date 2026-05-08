@@ -138,6 +138,7 @@ header h1 {
   height: 16px;
 }
 
+.btn-copy,
 .btn-download {
   flex-shrink: 0;
   display: inline-flex;
@@ -153,11 +154,13 @@ header h1 {
   transition: all 0.15s;
 }
 
+.btn-copy:hover,
 .btn-download:hover {
   background: rgba(0, 0, 0, 0.06);
   color: #000;
 }
 
+.btn-copy .lucide,
 .btn-download .lucide {
   width: 16px;
   height: 16px;

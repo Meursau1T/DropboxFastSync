@@ -1,11 +1,12 @@
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { fetch } from '@tauri-apps/plugin-http';
 import { writeFile, BaseDirectory } from '@tauri-apps/plugin-fs';
-import { createIcons, LogIn, LogOut, RefreshCw, Upload, File, Trash2, Download } from 'lucide';
+import { writeText } from '@tauri-apps/plugin-clipboard-manager';
+import { createIcons, LogIn, LogOut, RefreshCw, Upload, File, Trash2, Download, Copy } from 'lucide';
 import { startOAuth, clearSession } from './auth';
 import { listFiles, uploadFiles, uploadFileBuffer, deleteFile, downloadFile, type DropboxFile } from './api';
 
-const lucideIcons = { LogIn, LogOut, RefreshCw, Upload, File, Trash2, Download };
+const lucideIcons = { LogIn, LogOut, RefreshCw, Upload, File, Trash2, Download, Copy };
 
 function initIcons(root?: HTMLElement): void {
   createIcons({ icons: lucideIcons, root });
@@ -164,6 +165,21 @@ async function handleDownload(path: string): Promise<void> {
   }
 }
 
+async function handleCopy(path: string): Promise<void> {
+  try {
+    showStatus('Copying...');
+    const url = await downloadFile(path);
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const text = await response.text();
+    await writeText(text);
+    showStatus('Copied to clipboard');
+  } catch (e) {
+    showStatus('Failed to copy content', true);
+    console.error(e);
+  }
+}
+
 async function renderFileList(): Promise<void> {
   try {
     files = await listFiles();
@@ -188,6 +204,7 @@ async function renderFileList(): Promise<void> {
               <span class="file-meta">${formatSize(f.size)} · ${formatDate(f.client_modified)}</span>
             </div>
           </div>
+          ${f.name.endsWith('.txt') ? `<button class="btn-copy" data-path="${f.path}" title="Copy content"><i data-lucide="copy"></i></button>` : ''}
           <button class="btn-download" data-path="${f.path}" title="Download file"><i data-lucide="download"></i></button>
           <button class="btn-delete" data-path="${f.path}" title="Delete file"><i data-lucide="trash-2"></i></button>
         </div>
@@ -195,7 +212,15 @@ async function renderFileList(): Promise<void> {
       )
       .join('');
 
-    // Bind download and delete buttons
+    // Bind copy, download and delete buttons
+    fileList.querySelectorAll('.btn-copy').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const path = (btn as HTMLElement).dataset.path;
+        if (path) handleCopy(path);
+      });
+    });
+
     fileList.querySelectorAll('.btn-download').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
