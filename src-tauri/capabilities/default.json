@@ -12,7 +12,8 @@
         { "url": "https://api.dropboxapi.com/**" },
         { "url": "https://content.dropboxapi.com/**" },
         { "url": "https://www.dropbox.com/**" },
-        { "url": "https://api.dropbox.com/**" }
+        { "url": "https://api.dropbox.com/**" },
+        { "url": "https://*.dropboxusercontent.com/**" }
       ]
     },
     "fs:default",
@@ -25,6 +26,7 @@
         { "path": "$DOWNLOAD/**" }
       ]
     },
+    "fs:allow-download-write",
     "store:default",
     "opener:default",
     {

@@ -1,5 +1,6 @@
 import { getCurrentWindow } from '@tauri-apps/api/window';
-import { openUrl } from '@tauri-apps/plugin-opener';
+import { fetch } from '@tauri-apps/plugin-http';
+import { writeFile, BaseDirectory } from '@tauri-apps/plugin-fs';
 import { createIcons, LogIn, LogOut, RefreshCw, Upload, File, Trash2, Download } from 'lucide';
 import { startOAuth, clearSession } from './auth';
 import { listFiles, uploadFiles, uploadFileBuffer, deleteFile, downloadFile, type DropboxFile } from './api';
@@ -146,9 +147,17 @@ async function handleDelete(path: string): Promise<void> {
 
 async function handleDownload(path: string): Promise<void> {
   try {
-    showStatus('Preparing download...');
+    showStatus('Downloading...');
     const url = await downloadFile(path);
-    await openUrl(url);
+    const fileName = path.split('/').pop() || 'download';
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const arrayBuffer = await response.arrayBuffer();
+    await writeFile(fileName, new Uint8Array(arrayBuffer), { baseDir: BaseDirectory.Download });
+
+    showStatus(`Saved to Downloads/${fileName}`);
   } catch (e) {
     showStatus('Failed to download file', true);
     console.error(e);
